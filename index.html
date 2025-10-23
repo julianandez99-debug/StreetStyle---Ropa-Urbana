@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StreetStyle - Tienda Urbana</title>
+  <style>
+    body {
+      font-family: 'Poppins', system-ui, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      padding: 20px;
+      text-align: center;
+      margin: 0;
+    }
+
+    header {
+      margin-bottom: 30px;
+    }
+
+    .catalogo {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .producto {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      width: 230px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .producto:hover {
+      transform: scale(1.05);
+    }
+
+    .producto img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    button {
+      background-color: #222;
+      color: white;
+      border: none;
+      padding: 8px 10px;
+      margin-top: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #444;
+    }
+
+    .carrito {
+      background: #fff;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 30px;
+      text-align: left;
+      width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    button.vaciar {
+      background-color: #dc3545;
+    }
+
+    button.finalizar {
+      background-color: #007bff;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧥 StreetStyle - Ropa Urbana</h1>
+    <p>Diseñado por Juan Andrés López — Hoodies, Gorras y Busos Oversize</p>
+
+    <div class="filtros">
+      <label for="categoria">Filtrar por categoría:</label>
+      <select id="categoria">
+        <option value="todas">🛍️ Todas</option>
+        <option value="Hoodies">🧥 Hoodies</option>
+        <option value="Gorras">🧢 Gorras</option>
+        <option value="Busos oversize">👕 Busos Oversize</option>
+      </select>
+    </div>
+  </header>
+
+  <main>
+    <section id="productos" class="catalogo"></section>
+
+    <aside class="carrito">
+      <h2>🧾 Carrito de Compras (0)</h2>
+      <ul id="lista-carrito"></ul
