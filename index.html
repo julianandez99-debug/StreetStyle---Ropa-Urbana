@@ -65,7 +65,7 @@
       padding: 15px;
       margin-top: 30px;
       text-align: left;
-      width: 300px;
+      width: 320px;
       margin-left: auto;
       margin-right: auto;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -107,4 +107,126 @@
 
     <aside class="carrito">
       <h2>🧾 Carrito de Compras (0)</h2>
-      <ul id="lista-carrito"></ul
+      <ul id="lista-carrito"></ul>
+      <p><strong>Total: <span id="total">$0</span></strong></p>
+      <p id="contador-items">(0 productos)</p>
+      <button id="btn-vaciar" class="vaciar">🧼 Vaciar Carrito</button>
+      <div id="paypal-button-container" style="margin-top:12px; display:none;"></div>
+    </aside>
+  </main>
+
+  <footer>
+    <p>© 2025 StreetStyle — Juan Andrés López</p>
+  </footer>
+
+  <!-- SDK de PayPal -->
+  <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=COP" defer></script>
+
+  <!-- Script principal -->
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const productos = [
+        { id: 1, nombre: "Hoodie 'Black Street'", categoria: "Hoodies", precio: 120000, imagen: "https://i.imgur.com/PKX5Uci.jpeg" },
+        { id: 2, nombre: "Hoodie 'Retro Gray'", categoria: "Hoodies", precio: 115000, imagen: "https://i.imgur.com/oZzQ5kI.jpeg" },
+        { id: 3, nombre: "Gorra 'NYC Flat'", categoria: "Gorras", precio: 75000, imagen: "https://i.imgur.com/HtcWDIm.jpeg" },
+        { id: 4, nombre: "Gorra 'Classic White'", categoria: "Gorras", precio: 70000, imagen: "https://i.imgur.com/4bxQoQo.jpeg" },
+        { id: 5, nombre: "Buso Oversize 'Storm'", categoria: "Busos oversize", precio: 95000, imagen: "https://i.imgur.com/m1e9HhW.jpeg" },
+        { id: 6, nombre: "Buso Oversize 'Skyline'", categoria: "Busos oversize", precio: 99000, imagen: "https://i.imgur.com/Yoe8O0n.jpeg" },
+      ];
+
+      let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+      const contenedor = document.getElementById("productos");
+      const listaCarrito = document.getElementById("lista-carrito");
+      const totalCarrito = document.getElementById("total");
+      const contadorItems = document.getElementById("contador-items");
+      const paypalContainer = document.getElementById("paypal-button-container");
+
+      function renderProductos(lista) {
+        contenedor.innerHTML = "";
+        lista.forEach(prod => {
+          const card = document.createElement("div");
+          card.className = "producto";
+          card.innerHTML = `
+            <img src="${prod.imagen}" alt="${prod.nombre}">
+            <h3>${prod.nombre}</h3>
+            <p>${new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP' }).format(prod.precio)}</p>
+            <button onclick="agregarProducto(${prod.id})">Agregar</button>
+          `;
+          contenedor.appendChild(card);
+        });
+      }
+
+      window.agregarProducto = (id) => {
+        const prod = productos.find(p => p.id === id);
+        const item = carrito.find(p => p.id === id);
+        if (item) item.cantidad++;
+        else carrito.push({ ...prod, cantidad: 1 });
+        guardarYActualizar();
+      };
+
+      function vaciar() {
+        if (confirm("¿Seguro que quieres vaciar el carrito?")) {
+          carrito = [];
+          guardarYActualizar();
+        }
+      }
+
+      function guardarYActualizar() {
+        localStorage.setItem("carrito", JSON.stringify(carrito));
+        renderCarrito();
+      }
+
+      function renderCarrito() {
+        listaCarrito.innerHTML = "";
+        let total = 0;
+        let cantidad = 0;
+        carrito.forEach(item => {
+          total += item.precio * item.cantidad;
+          cantidad += item.cantidad;
+          const li = document.createElement("li");
+          li.textContent = `${item.nombre} x${item.cantidad} — ${new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP' }).format(item.precio * item.cantidad)}`;
+          listaCarrito.appendChild(li);
+        });
+        totalCarrito.textContent = new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP' }).format(total);
+        contadorItems.textContent = `(${cantidad} producto${cantidad !== 1 ? 's' : ''})`;
+        document.querySelector(".carrito h2").textContent = `🧾 Carrito de Compras (${cantidad})`;
+
+        if (total > 0 && window.paypal) {
+          paypalContainer.style.display = "block";
+          renderPayPal(total);
+        } else {
+          paypalContainer.style.display = "none";
+        }
+      }
+
+      function renderPayPal(total) {
+        paypalContainer.innerHTML = "";
+        paypal.Buttons({
+          style: { color: 'blue', shape: 'rect', label: 'paypal' },
+          createOrder: (data, actions) => actions.order.create({
+            purchase_units: [{ amount: { value: (total / 4000).toFixed(2) } }]
+          }),
+          onApprove: () => {
+            alert("🎉 Pago completado con éxito. ¡Gracias por tu compra!");
+            carrito = [];
+            guardarYActualizar();
+          }
+        }).render("#paypal-button-container");
+      }
+
+      document.getElementById("btn-vaciar").addEventListener("click", vaciar);
+
+      document.getElementById("categoria").addEventListener("change", e => {
+        const cat = e.target.value;
+        if (cat === "todas") renderProductos(productos);
+        else renderProductos(productos.filter(p => p.categoria === cat));
+      });
+
+      renderProductos(productos);
+      renderCarrito();
+    });
+  </script>
+</body>
+</html>
+
